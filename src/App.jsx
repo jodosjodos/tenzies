@@ -5,81 +5,89 @@ import { nanoid } from 'nanoid';
 import Confetti from "react-confetti"
 
 function App() {
-  // generate structure and value of die
-  const generateDice = () => {
-    const seed = Date.now(); // use the current time as a seed
-    const random = Math.floor(Math.random() * 6); // generate a random integer between 0 and 5
-    const value = (random + seed) % 6; // use the seed to offset the value by a different amount for each die
-    return {
-      value,
-      isHeld: false,
-      id: nanoid(),
-    };
-  };
-  
-  
-  // get new dice with new values 
-  const allNewDice=()=>{
-    let arr=[];
-    for(let i=1;i <=10;i++){
-      arr.push(generateDice())
+
+//  generate random numbers
+
+  const generateNumbers=()=>{
+    return{
+      value:Math.floor(Math.random()*6),
+      isHeld:false,
+      id:nanoid()
+    }
+  }
+
+// get random numbers 
+
+  const allDice=()=>{
+    let arr=[]
+    for(let i=1;i<=10;i++){
+     arr.push(generateNumbers())
     }
     return arr
+
   }
 
-  // dice variable
-  const [dice,setDice]=useState(allNewDice());
+// initialization
 
-  //track if user has won
-  const [tenzies,setTenzies]=useState(false)
+  const [dice,setDice]=useState(allDice())
+  const [tenzies,setTenzies]=useState(false);
   
-  useEffect(()=>{
-    const allheld=dice.every(die=>die.isHeld)
-    const firstValue=dice[0].value;
-    const allSameValue=dice.every(die=>die.value=firstValue)
+//  check if dice is helded
+
+  const holded=(id)=>{
+ 
+      setDice(dice.map((die)=>{
+       if(die.id===id){
+         return {...die,isHeld:!die.isHeld}
+       }else{
+         return die
+       }
+      }))
     
-    if(allheld && allSameValue){
-      setTenzies(true)
-      console.log('u won');
-    }
+  }
+
+// maintaing state
+
+  useEffect(()=>{
+    const isHelded=dice.every(die=>die.isHeld)
+   const firstValue=dice[0].value;
+   const samValue=dice.every(die=>die.value==firstValue)
+   if(isHelded && samValue){
+    setTenzies(true)
+    console.log('u won');
+   }
+   
   },[dice])
 
-  // hold clicked die 
-  const holdDice=(id)=>{
-    setDice(dice.map((die)=>{
-      if(die.id===id){
-        const isHelded=die.isHeld
-        return {...die,isHeld:!isHelded}
-      }else{
-        return die
-      }
-    }))
-  }
+//  change values if u haven't win
 
-  // roll dice function
-  const rollDice=()=>{
-    if(!tenzies){
-      setDice(oldDice=>oldDice.map(die=>{
-        return die.isHeld ? die : generateDice()
-      }))
-    }else{
-      setTenzies(false)
-      setDice(allNewDice())
-    }
-  }
+const rollDice=()=>{
+if(!tenzies){
+  setDice(oldDice=>
 
-  // renderable variable
-  const showable=dice.map((eachNumber)=>{
-    return (
-      <Die
-        key={eachNumber.id}
-        value={eachNumber.value }
-        isHeld={eachNumber.isHeld}
-        holder={()=>{return holdDice(eachNumber.id)}}
-      />
-    )
-  })
+    oldDice.map((die)=>{
+     return die.isHeld?die:generateNumbers()
+    })
+  )
+}else{
+  setTenzies(false)
+  setDice(allDice())
+}
+}
+
   
+
+//  render components
+
+   const showable=dice.map((eachDice)=>{
+    
+    return <Die 
+    key={eachDice.id}
+    isHeld={eachDice.isHeld}
+    value={eachDice.value} 
+    holder={()=>{return holded(eachDice.id)}}
+    />
+   })
   return (
     <main>
       {tenzies && <Confetti width={window.innerWidth} height={window.innerHeight} />}
@@ -90,7 +98,7 @@ function App() {
       <div className='dieContainer'>
         {showable}
       </div>
-      <button onClick={rollDice} className='rollDice'>{tenzies?"New Game":"Roll"}</button>
+     <button className='rollDice' onClick={rollDice}>{tenzies?"New game":"roll"}</button>
     </main>
   )
 }

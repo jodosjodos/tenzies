@@ -31,6 +31,7 @@ function App() {
 
   const [dice,setDice]=useState(allDice())
   const [tenzies,setTenzies]=useState(false);
+  const [count,setCount]=useState(0)
   
 //  check if dice is helded
 
@@ -56,11 +57,11 @@ function App() {
     setTenzies(true)
     console.log('u won');
    }
-   
+ 
   },[dice])
 
 //  change values if u haven't win
-
+ console.log(count);
 const rollDice=()=>{
 if(!tenzies){
   setDice(oldDice=>
@@ -69,9 +70,13 @@ if(!tenzies){
      return die.isHeld?die:generateNumbers()
     })
   )
+  setCount((olCount)=>{
+    return olCount+1;
+   })
 }else{
   setTenzies(false)
   setDice(allDice())
+  setCount(0)
 }
 }
 
@@ -99,6 +104,7 @@ if(!tenzies){
         {showable}
       </div>
      <button className='rollDice' onClick={rollDice}>{tenzies?"New game":"roll"}</button>
+     {tenzies && <p className='numberOfRolls'> you have rolled {count} times , congs</p>}
     </main>
   )
 }

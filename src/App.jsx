@@ -10,7 +10,7 @@ function App() {
 
   const generateNumbers=()=>{
     return{
-      value:Math.floor(Math.random()*6),
+      value:Math.floor(Math.random()*6)+1,
       isHeld:false,
       id:nanoid()
     }
@@ -61,7 +61,7 @@ function App() {
   },[dice])
 
 //  change values if u haven't win
- console.log(count);
+
 const rollDice=()=>{
 if(!tenzies){
   setDice(oldDice=>
